@@ -66,7 +66,11 @@ public:
     void bind()
     {
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GLSetting);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), &vertices[0], GLSetting);
+    }
+
+    void unbind()
+    {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -82,6 +86,21 @@ public:
     {
         glGenVertexArrays(1, &vao);
     }
+    VAO(const VAO &other) = delete;
+    VAO &operator=(const VAO &other) = delete;
+    VAO(VAO &&other)
+    {
+        swap(*this, other);
+    }
+    VAO &operator=(VAO &&other)
+    {
+        vao = 0;
+        swap(*this, other);
+    }
+    ~VAO()
+    {
+        glDeleteVertexArrays(1, &vao);
+    }
 
     void bind()
     {
@@ -91,7 +110,14 @@ public:
     // replace with some generic, possibly taking a function object in VAO's constructor to call the attribs
     void setAttribs()
     {
+        bind();
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(0);
+    }
+
+    friend void swap(VAO &first, VAO &second) noexcept
+    {
+        std::swap(first.vao, second.vao);
     }
 
 private:
@@ -166,6 +192,16 @@ public:
         }
 
         glLinkProgram(shaderProgram);
+
+        int success;
+        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+        if (!success)
+        {
+            char infoLog[512];
+            glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
+                      << infoLog << "\n";
+        }
     }
     //TODO:: Define copy move and destructors
 
