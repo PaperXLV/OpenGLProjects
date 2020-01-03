@@ -213,3 +213,90 @@ public:
 private:
     unsigned int shaderProgram{0};
 };
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
+class GLFWhandler
+{
+public:
+    GLFWhandler()
+    {
+        glfwInit();
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+        valid = true;
+        // Parameters/globals for this at some point I think
+        window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+        if (window == NULL)
+        {
+            std::cerr << "Failed to create GLFW window\n";
+            glfwTerminate();
+            valid = false;
+        }
+        else
+        {
+            glfwMakeContextCurrent(window);
+
+            if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+            {
+                std::cerr << "Failed to initialize GLAD\n";
+                glfwTerminate();
+                valid = false;
+            }
+            else
+            {
+                glViewport(0, 0, 800, 600);
+                glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+            }
+        }
+    }
+
+    friend void swap(GLFWhandler &first, GLFWhandler &second)
+    {
+        std::swap(first.window, second.window);
+        std::swap(first.valid, second.valid);
+    }
+
+    GLFWhandler(const GLFWhandler &other) = delete;
+    GLFWhandler &operator=(const GLFWhandler &other) = delete;
+    GLFWhandler(GLFWhandler &&other)
+    {
+        valid = false;
+        swap(*this, other);
+    }
+    GLFWhandler &operator=(GLFWhandler &&other)
+    {
+        valid = false;
+        swap(*this, other);
+    }
+
+    void swapBuffers()
+    {
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    bool heartbeat()
+    {
+        return !glfwWindowShouldClose(window);
+    }
+
+    bool getValid()
+    {
+        return valid;
+    }
+
+    ~GLFWhandler()
+    {
+        glfwTerminate();
+    }
+
+private:
+    GLFWwindow *window{nullptr};
+    bool valid{false};
+};
