@@ -28,7 +28,7 @@ template <typename T, size_t GLSetting>
 class VBO
 {
 public:
-    VBO()
+    explicit VBO()
     {
         glGenBuffers(1, &buffer);
     }
@@ -56,6 +56,7 @@ public:
         glDeleteBuffers(1, &buffer);
         buffer = 0;
         swap(*this, other);
+        return *this;
     }
 
     ~VBO()
@@ -65,6 +66,10 @@ public:
 
     void bind()
     {
+        if (vertices.size() == 0)
+        {
+            std::cout << "WARNING::Empty data in VBO\n";
+        }
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), &vertices[0], GLSetting);
     }
@@ -82,7 +87,7 @@ private:
 class VAO
 {
 public:
-    VAO()
+    explicit VAO()
     {
         glGenVertexArrays(1, &vao);
     }
@@ -96,6 +101,7 @@ public:
     {
         vao = 0;
         swap(*this, other);
+        return *this;
     }
     ~VAO()
     {
@@ -128,7 +134,7 @@ template <typename T, size_t GLSetting>
 class EBO
 {
 public:
-    EBO()
+    explicit EBO()
     {
         glGenBuffers(1, &ebo);
     }
@@ -163,8 +169,16 @@ public:
     // If data is empty. See if thats a problem
     void bind()
     {
+        if (data.size() == 0)
+        {
+            std::cout << "WARNING::Empty data in EBO\n";
+        }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(T), &data[0], GLSetting);
+    }
+    void unbind()
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
 private:
@@ -321,6 +335,7 @@ public:
     {
         valid = false;
         swap(*this, other);
+        return *this;
     }
 
     void swapBuffers()

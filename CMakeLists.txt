@@ -5,7 +5,7 @@ project(OpenGL VERSION 0.1)
 # specify c++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS -O3)
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Werror")
 
 set(PROJECT_BINARY_DIR ${PROJECT_SOURCE_DIR}/build/bin)
 

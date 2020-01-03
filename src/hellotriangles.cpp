@@ -28,7 +28,7 @@ constexpr std::array<vec3<float>, 4> vertices{vec3{0.5f, 0.5f, 0.0f},
                                               vec3{-0.5f, 0.5f, 0.0f}};
 
 constexpr std::array<vec3<int>, 2> indices{
-    vec3{0, 1, 2}, vec3{1, 2, 3}};
+    vec3{0, 1, 3}, vec3{1, 2, 3}};
 
 int main()
 {
@@ -41,15 +41,15 @@ int main()
 
     // VBO and VAO
     VAO vao{};
-    EBO<vec3<int>, GL_STATIC_DRAW> ebo{};
-
     vao.bind();
+
+    EBO<vec3<int>, GL_STATIC_DRAW> ebo{std::vector<vec3<int>>{indices.begin(), indices.end()}};
     VBO<vec3<float>, GL_STATIC_DRAW> vbo{std::vector<vec3<float>>{vertices.begin(), vertices.end()}};
     vbo.bind();
     ebo.bind();
 
     vao.setAttribs();
-    vbo.unbind();
+    //vbo.unbind();
 
     // Compiling shaders
     ShaderProgram sp{vertexShaderSource, fragmentShaderSource};
