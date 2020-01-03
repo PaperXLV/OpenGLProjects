@@ -22,9 +22,13 @@ void main()
     FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
 })";
 
-constexpr std::array<vec3<float>, 3> vertices{vec3{-0.5f, -0.5f, 0.0f},
+constexpr std::array<vec3<float>, 4> vertices{vec3{0.5f, 0.5f, 0.0f},
                                               vec3{0.5f, -0.5f, 0.0f},
-                                              vec3{0.0f, 0.5f, 0.0f}};
+                                              vec3{-0.5f, -0.5f, 0.0f},
+                                              vec3{-0.5f, 0.5f, 0.0f}};
+
+constexpr std::array<vec3<int>, 2> indices{
+    vec3{0, 1, 2}, vec3{1, 2, 3}};
 
 int main()
 {
@@ -37,9 +41,13 @@ int main()
 
     // VBO and VAO
     VAO vao{};
+    EBO<vec3<int>, GL_STATIC_DRAW> ebo{};
+
     vao.bind();
     VBO<vec3<float>, GL_STATIC_DRAW> vbo{std::vector<vec3<float>>{vertices.begin(), vertices.end()}};
     vbo.bind();
+    ebo.bind();
+
     vao.setAttribs();
     vbo.unbind();
 
@@ -60,7 +68,9 @@ int main()
 
         sp.use();
         vao.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
         glfwhandle.swapBuffers();
     }

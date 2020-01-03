@@ -124,6 +124,54 @@ private:
     unsigned int vao;
 };
 
+template <typename T, size_t GLSetting>
+class EBO
+{
+public:
+    EBO()
+    {
+        glGenBuffers(1, &ebo);
+    }
+    EBO(const std::vector<T> &edata) : EBO()
+    {
+        data = edata;
+    }
+    EBO(std::vector<T> &&edata) : EBO()
+    {
+        data = edata;
+    }
+    EBO(const EBO &other) = delete;
+    EBO &operator=(const EBO &other) = delete;
+    EBO(EBO &&other)
+    {
+        ebo = 0;
+        data.clear();
+        swap(*this, other);
+    }
+    EBO &operator=(EBO &&other)
+    {
+        ebo = 0;
+        data.clear();
+        swap(*this, other);
+    }
+    ~EBO()
+    {
+        glDeleteBuffers(1, &ebo);
+    }
+
+    // I could see this function segfaulting depenting on opengl's buffer data
+    // If data is empty. See if thats a problem
+    void bind()
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(T), &data[0], GLSetting);
+    }
+
+private:
+    unsigned int ebo{0};
+    std::vector<T> data{};
+};
+
 template <size_t GL_Shader_Type>
 class Shader
 {
