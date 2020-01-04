@@ -36,11 +36,19 @@ public:
     VBO(const std::vector<T> &vertData) : VBO()
     {
         vertices = vertData;
+        if (vertices.size() == 0)
+        {
+            std::cout << "WARNING::Empty data in VBO\n";
+        }
     }
 
     VBO(std::vector<T> &&vertData) : VBO()
     {
         vertices = vertData;
+        if (vertices.size() == 0)
+        {
+            std::cout << "WARNING::Empty data in VBO\n";
+        }
     };
 
     //Array implimentation is too difficult. Return to later
@@ -66,10 +74,7 @@ public:
 
     void bind()
     {
-        if (vertices.size() == 0)
-        {
-            std::cout << "WARNING::Empty data in VBO\n";
-        }
+
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), &vertices[0], GLSetting);
     }
@@ -113,6 +118,11 @@ public:
         glBindVertexArray(vao);
     }
 
+    void unbind()
+    {
+        glBindVertexArray(0);
+    }
+
     // replace with some generic, possibly taking a function object in VAO's constructor to call the attribs
     void setAttribs()
     {
@@ -141,10 +151,18 @@ public:
     EBO(const std::vector<T> &edata) : EBO()
     {
         data = edata;
+        if (data.size() == 0)
+        {
+            std::cout << "WARNING::Empty data in EBO\n";
+        }
     }
     EBO(std::vector<T> &&edata) : EBO()
     {
         data = edata;
+        if (data.size() == 0)
+        {
+            std::cout << "WARNING::Empty data in EBO\n";
+        }
     }
     EBO(const EBO &other) = delete;
     EBO &operator=(const EBO &other) = delete;
@@ -165,14 +183,9 @@ public:
         glDeleteBuffers(1, &ebo);
     }
 
-    // I could see this function segfaulting depenting on opengl's buffer data
-    // If data is empty. See if thats a problem
     void bind()
     {
-        if (data.size() == 0)
-        {
-            std::cout << "WARNING::Empty data in EBO\n";
-        }
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(T), &data[0], GLSetting);
     }

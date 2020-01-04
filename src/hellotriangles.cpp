@@ -22,13 +22,25 @@ void main()
     FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
 })";
 
+static const char *fragmentShaderSource2 = R"(
+#version 330 core
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);
+})";
+
 constexpr std::array<vec3<float>, 4> vertices{vec3{0.5f, 0.5f, 0.0f},
                                               vec3{0.5f, -0.5f, 0.0f},
                                               vec3{-0.5f, -0.5f, 0.0f},
                                               vec3{-0.5f, 0.5f, 0.0f}};
 
-constexpr std::array<vec3<int>, 2> indices{
-    vec3{0, 1, 3}, vec3{1, 2, 3}};
+constexpr std::array<vec3<int>, 1> indices1{
+    vec3{0, 1, 3}};
+
+constexpr std::array<vec3<int>, 1> indices2{
+    vec3{1, 2, 3}};
 
 int main()
 {
@@ -43,20 +55,26 @@ int main()
     VAO vao{};
     vao.bind();
 
-    EBO<vec3<int>, GL_STATIC_DRAW> ebo{std::vector<vec3<int>>{indices.begin(), indices.end()}};
+    EBO<vec3<int>, GL_STATIC_DRAW> ebo{std::vector<vec3<int>>{indices1.begin(), indices1.end()}};
     VBO<vec3<float>, GL_STATIC_DRAW> vbo{std::vector<vec3<float>>{vertices.begin(), vertices.end()}};
     vbo.bind();
     ebo.bind();
 
     vao.setAttribs();
-    //vbo.unbind();
+    vao.unbind();
+
+    VAO vao2{};
+    vao2.bind();
+    EBO<vec3<int>, GL_STATIC_DRAW> ebo2{std::vector<vec3<int>>{indices2.begin(), indices2.end()}};
+    vbo.bind();
+    ebo2.bind();
+
+    vao2.setAttribs();
+    vao2.unbind();
 
     // Compiling shaders
     ShaderProgram sp{vertexShaderSource, fragmentShaderSource};
-
-    // instructions for interpreting the vertex data
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-    //glEnableVertexAttribArray(0);
+    ShaderProgram sp2{vertexShaderSource, fragmentShaderSource2};
 
     sp.use();
 
@@ -69,8 +87,13 @@ int main()
         sp.use();
         vao.bind();
         //glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        vao.unbind();
+        sp2.use();
+        vao2.bind();
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+
+        vao2.unbind();
 
         glfwhandle.swapBuffers();
     }
