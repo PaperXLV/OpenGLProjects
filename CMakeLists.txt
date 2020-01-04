@@ -20,10 +20,12 @@ add_subdirectory(glad/)
 
 add_executable(HelloWorld ${PROJECT_SOURCE_DIR}/src/helloworld.cpp)
 add_executable(HelloTriangle ${PROJECT_SOURCE_DIR}/src/hellotriangles.cpp)
+add_executable(Shaders ${PROJECT_SOURCE_DIR}/src/shaderpractice.cpp)
 
 target_include_directories(HelloWorld PRIVATE ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(HelloTriangle PRIVATE ${PROJECT_SOURCE_DIR}/include)
-
+target_include_directories(Shaders PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
 target_link_libraries(HelloWorld PRIVATE glad glfw OpenGL::GL ${CMAKE_DL_LIBS})
 target_link_libraries(HelloTriangle PRIVATE glad glfw OpenGL::GL ${CMAKE_DL_LIBS})
+target_link_libraries(Shaders PRIVATE glad glfw OpenGL::GL ${CMAKE_DL_LIBS})
