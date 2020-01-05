@@ -61,7 +61,6 @@ public:
         Shader<GL_FRAGMENT_SHADER> frag{fragSource};
 
         shaderProgram = glCreateProgram();
-        std::cout << "MADE PROGRAM: " << shaderProgram << "\n";
         glAttachShader(shaderProgram, vertex.getShader());
         glAttachShader(shaderProgram, frag.getShader());
 
@@ -97,7 +96,6 @@ public:
 
     unsigned int getProgramNumber() const
     {
-        std::cout << "returning program: " << shaderProgram << "\n";
         return shaderProgram;
     }
 

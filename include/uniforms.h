@@ -17,14 +17,13 @@ template <typename T, typename func = void (*)(T)>
 class Uniform
 {
 public:
-    Uniform()
+    Uniform(std::string name, const unsigned int shaderProgram, T data) : name{name}, shaderProgram{shaderProgram}, data{data}, updateFunc{setNull}, alternateFuncFlag{false}
     {
-        std::cout << "ILLEGAL\n";
     }
-    Uniform(std::string name, const unsigned int shaderProgram, T data, func updateFunc = setNull) : name{name}, shaderProgram{shaderProgram}, data{data}, updateFunc{updateFunc}
+    Uniform(std::string name, const unsigned int shaderProgram, T data, func updateFunc) : name{name}, shaderProgram{shaderProgram}, data{data}, updateFunc{updateFunc}, alternateFuncFlag{true}
     {
-        std::cout << "INSTANTIATING UNIFORM WITH NAME: " << name << "\nPROGRAM: " << shaderProgram << "\n";
     }
+    // TODO:: disable copy because uniform is a resource?
     Uniform(const Uniform &other)
     {
         std::cout << "COPY CONSTRUCTOR \n";
@@ -73,29 +72,31 @@ public:
         name = newName;
     }
 
-    // Calls a function passed by template parameter on data.
-    // Otherwise, I would have to find some way to constexpr if
-    // my way through all the possible data types T can be.
+    // Check alternateFuncFlag to see if user supplied a different function for update
+    // Doing this so the user does not have to create sub-uniform classes while getting
+    // custom functionality out of them.
     void update()
     {
-        setDefaultUpdate(data);
-        //updateFunc(data);
+        if (!alternateFuncFlag)
+        {
+            defaultUpdate(data);
+        }
+        else
+        {
+            updateFunc(data);
+        }
     }
 
     // Default funcs to use
 
-    void setDefaultUpdate(T data)
+    void defaultUpdate(T data)
     {
         int loc = glGetUniformLocation(shaderProgram, name.c_str());
-        std::cout << "LOOKING FOR " << name << " IN PROGRAM: " << shaderProgram << "\n"
-                  << "LOCATION: " << loc << "\n";
 
         if constexpr (std::is_class_v<T>)
         {
             if constexpr (std::is_floating_point_v<typename T::c_type>)
             {
-                std::cout
-                    << data;
                 glUniform3f(loc, data.x, data.y, data.z);
             }
             // watch out for booleans, idk if they will bug or not
@@ -141,52 +142,5 @@ private:
     unsigned int shaderProgram{};
     T data{};
     func updateFunc{setNull};
+    bool alternateFuncFlag{false};
 };
-/*
-template <typename T, typename func>
-void setDefaultUpdate(Uniform<T, func> &uni)
-{
-    //std::cout << name << "\n";
-    //int loc = glGetUniformLocation(shaderProgram, name.c_str());
-    int loc = glGetUniformLocation(uni.shaderProgram, "color");
-    std::cout << "LOOKING FOR "
-              << " IN PROGRAM: " << uni.shaderProgram << "\n"
-              << "LOCATION: " << loc << "\n";
-
-    if constexpr (std::is_class_v<T>)
-    {
-        if constexpr (std::is_floating_point_v<typename T::c_type>)
-        {
-            std::cout << "FP VECTOR\n"
-                      << uni.data;
-            //glUniform3f(loc, uni.data.x, uni.data.y, uni.data.z);
-            glUniform3f(loc, 1.0f, 0.0f, 0.0f);
-        }
-        // watch out for booleans, idk if they will bug or not
-        else if constexpr (std::is_integral_v<typename T::c_type>)
-        {
-            std::cout << "INT VECTOR\n";
-            glUniform3i(loc, uni.data.x, uni.data.y, uni.data.z);
-        }
-        else
-        {
-            std::cout << "unsupported type for nonTrivial default\n";
-        }
-    }
-    else
-    {
-        if constexpr (std::is_floating_point_v<T>)
-        {
-            glUniform1f(loc, uni.data);
-        }
-        else if constexpr (std::is_integral_v<T>)
-        {
-            glUniform1i(loc, (int)uni.data);
-        }
-        else
-        {
-            std::cout << "unsupported type for setTrivial\n";
-        }
-    }
-}
-*/
