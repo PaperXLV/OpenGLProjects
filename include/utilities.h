@@ -7,7 +7,12 @@
 template <typename T>
 struct vec3
 {
+    //using c_type = typename vec3::type;
+    using c_type = T;
+
     T x, y, z;
+
+    //using c_type = typename T;
 
     constexpr vec3() : x{0}, y{0}, z{0}
     {
@@ -22,4 +27,10 @@ struct vec3
     vec3 &operator=(const vec3 &other) = default;
     vec3 &operator=(vec3 &&other) = default;
     ~vec3() = default;
+
+    friend std::ostream &operator<<(std::ostream &out, const vec3 &v)
+    {
+        out << "Vector:(" << v.x << ", " << v.y << ", " << v.z << ")\n";
+        return out;
+    }
 };

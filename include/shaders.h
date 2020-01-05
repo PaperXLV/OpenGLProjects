@@ -1,3 +1,7 @@
+#include <string>
+#include "utility"
+#include <type_traits>
+
 template <size_t GL_Shader_Type>
 class Shader
 {
@@ -47,6 +51,7 @@ private:
     unsigned int shader{0};
 };
 
+//TODO:: have ShaderProgram manage it's own uniforms
 class ShaderProgram
 {
 public:
@@ -56,6 +61,7 @@ public:
         Shader<GL_FRAGMENT_SHADER> frag{fragSource};
 
         shaderProgram = glCreateProgram();
+        std::cout << "MADE PROGRAM: " << shaderProgram << "\n";
         glAttachShader(shaderProgram, vertex.getShader());
         glAttachShader(shaderProgram, frag.getShader());
 
@@ -84,9 +90,15 @@ public:
         glUseProgram(shaderProgram);
     }
 
-    int getUniformLocation(const GLchar *name)
+    int getUniformLocation(const GLchar *name) const
     {
         return glGetUniformLocation(shaderProgram, name);
+    }
+
+    unsigned int getProgramNumber() const
+    {
+        std::cout << "returning program: " << shaderProgram << "\n";
+        return shaderProgram;
     }
 
 private:

@@ -9,7 +9,7 @@
 #include "shaders.h"
 #include "uniforms.h"
 
-static const char *vertexShaderSource = R"(
+static const char *vertexShaderSource = R"glsl(
 #version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
@@ -18,11 +18,11 @@ out vec3 ourColor;
 
 void main()
 {
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    gl_Position = vec4(aPos.x, -1 * aPos.y, aPos.z, 1.0);
     ourColor = aColor;
-})";
+})glsl";
 
-static const char *fragmentShaderSource = R"(
+static const char *fragmentShaderSource = R"glsl(
 #version 330 core
 
 in vec3 ourColor;
@@ -32,7 +32,7 @@ out vec4 FragColor;
 void main()
 {
     FragColor = vec4(ourColor, 1.0);
-})";
+})glsl";
 /*
 constexpr std::array<vec3<float>, 4> vertices{vec3{0.5f, 0.5f, 0.0f},
                                               vec3{0.5f, -0.5f, 0.0f},

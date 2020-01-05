@@ -6,6 +6,7 @@
 #include "utilities.h"
 #include "graphics.h"
 #include "shaders.h"
+#include "uniforms.h"
 
 static const char *vertexShaderSource = R"(
 #version 330 core
@@ -20,18 +21,22 @@ static const char *fragmentShaderSource = R"(
 #version 330 core
 out vec4 FragColor;
 
+uniform vec3 color;
+
 void main()
 {
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    FragColor = vec4(color.xyz, 1.0f);
 })";
 
 static const char *fragmentShaderSource2 = R"(
 #version 330 core
 out vec4 FragColor;
 
+uniform vec3 color;
+
 void main()
 {
-    FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);
+    FragColor = vec4(color.xyz, 1.0f);
 })";
 
 constexpr std::array<vec3<float>, 4> vertices{vec3{0.5f, 0.5f, 0.0f},
@@ -85,6 +90,11 @@ int main()
     ShaderProgram sp2{vertexShaderSource, fragmentShaderSource2};
 
     sp.use();
+    Uniform uni{"color", sp.getProgramNumber(), vec3<float>{1.0f, 0.0f, 0.0f}};
+    Uniform uni2{"color", sp2.getProgramNumber(), vec3<float>{1.0f, 1.0f, 0.0f}};
+    uni.update();
+    sp2.use();
+    uni2.update();
 
     // Main loop
     while (glfwhandle.heartbeat())
