@@ -63,6 +63,8 @@ private:
     std::vector<T> vertices{};
 };
 
+// Needs work on the setAttrib function.
+template <typename func>
 class VAO
 {
 public:
@@ -70,6 +72,11 @@ public:
     {
         glGenVertexArrays(1, &vao);
     }
+    explicit VAO(func attribFunc) : attribFunc{attribFunc}
+    {
+        glGenVertexArrays(1, &vao);
+    }
+
     VAO(const VAO &other) = delete;
     VAO &operator=(const VAO &other) = delete;
     VAO(VAO &&other)
@@ -97,12 +104,10 @@ public:
         glBindVertexArray(0);
     }
 
-    // replace with some generic, possibly taking a function object in VAO's constructor to call the attribs
     void setAttribs()
     {
         bind();
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-        glEnableVertexAttribArray(0);
+        attribFunc();
     }
 
     friend void swap(VAO &first, VAO &second) noexcept
@@ -111,7 +116,8 @@ public:
     }
 
 private:
-    unsigned int vao;
+    unsigned int vao{0};
+    func attribFunc{};
 };
 
 template <typename T, size_t GLSetting>

@@ -12,23 +12,28 @@
 static const char *vertexShaderSource = R"(
 #version 330 core
 layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aColor;
+
+out vec3 ourColor;
 
 void main()
 {
     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    ourColor = aColor;
 })";
 
 static const char *fragmentShaderSource = R"(
 #version 330 core
-out vec4 FragColor;
 
-uniform vec4 green;
+in vec3 ourColor;
+
+out vec4 FragColor;
 
 void main()
 {
-    FragColor = green;
+    FragColor = vec4(ourColor, 1.0);
 })";
-
+/*
 constexpr std::array<vec3<float>, 4> vertices{vec3{0.5f, 0.5f, 0.0f},
                                               vec3{0.5f, -0.5f, 0.0f},
                                               vec3{-0.5f, -0.5f, 0.0f},
@@ -36,6 +41,14 @@ constexpr std::array<vec3<float>, 4> vertices{vec3{0.5f, 0.5f, 0.0f},
 
 constexpr std::array<vec3<int>, 1> indices{
     vec3{0, 1, 3}};
+*/
+constexpr std::array<vec3<float>, 6> vertices{
+    vec3{0.5f, -0.5f, 0.0f}, vec3{1.0f, 0.0f, 0.0f},
+    vec3{-0.5f, -0.5f, 0.0f}, vec3{0.0f, 1.0f, 0.0f},
+    vec3{0.0f, 0.5f, 0.0f}, vec3{0.0f, 0.0f, 1.0f}};
+
+constexpr std::array<vec3<int>, 1> indices{
+    vec3{0, 1, 2}};
 
 int main()
 {
@@ -47,7 +60,16 @@ int main()
     }
 
     // VBO and VAO
-    VAO vao{};
+    auto attribFunc = []() {
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(0);
+        // color attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+    };
+
+    VAO vao{attribFunc};
     vao.bind();
 
     EBO<vec3<int>, GL_STATIC_DRAW> ebo{std::vector<vec3<int>>{indices.begin(), indices.end()}};
@@ -64,9 +86,11 @@ int main()
     sp.use();
 
     // Uniform
+    /*
     int loc = sp.getUniformLocation("green");
     auto update = [=](const float data) { glUniform4f(loc, 0.0f, data, 0.0f, 1.0f); };
     Uniform<float, decltype(update)> uni{"green", update};
+    */
 
     // Main loop
     while (glfwhandle.heartbeat())
@@ -76,11 +100,12 @@ int main()
 
         sp.use();
 
+        /*
         float timeValue = glfwGetTime();
         float greenValue = std::sin(timeValue) / 2.0f + 0.5f;
         uni.setData(greenValue);
         uni.update();
-
+        */
         vao.bind();
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);

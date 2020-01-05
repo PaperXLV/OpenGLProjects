@@ -55,7 +55,12 @@ int main()
     }
 
     // VBO and VAO
-    VAO vao{};
+    auto vaoAttrib = []() {
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(0);
+    };
+
+    VAO vao{vaoAttrib};
     vao.bind();
 
     EBO<vec3<int>, GL_STATIC_DRAW> ebo{std::vector<vec3<int>>{indices1.begin(), indices1.end()}};
@@ -66,7 +71,7 @@ int main()
     vao.setAttribs();
     vao.unbind();
 
-    VAO vao2{};
+    VAO vao2{vaoAttrib};
     vao2.bind();
     EBO<vec3<int>, GL_STATIC_DRAW> ebo2{std::vector<vec3<int>>{indices2.begin(), indices2.end()}};
     vbo.bind();
