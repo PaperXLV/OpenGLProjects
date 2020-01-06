@@ -32,13 +32,14 @@ static const char *fragmentShaderSource = R"glsl(
 in vec3 ourColor;
 in vec2 TexCoord;
 
-uniform sampler2D ourTexture;
+uniform sampler2D texture1;
+uniform sampler2D texture2;
 
 out vec4 FragColor;
 
 void main()
 {
-    FragColor = texture(ourTexture, TexCoord);
+    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord * vec2(2.0, 2.0)), 0.2);
 })glsl";
 
 constexpr std::array<float, 32> vertexData{
@@ -62,7 +63,7 @@ int main()
     }
 
     // VBO and VAO
-    // TODO:: need a better way to determine stride. Possibly some sort of n-vector for vertexData, then we can just use vec.size()
+    // TODO:: need a better way to determine stride and offset. Possibly some sort of n-vector for vertexData, then we can just use vec.size()
     auto attribFunc = []() {
         // position attribute
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
@@ -92,7 +93,10 @@ int main()
     sp.use();
 
     Texture<GL_RGB> tex{texture_path / "container.jpg"};
-    tex.bind();
+    Texture<GL_RGB, GL_RGBA, GL_TEXTURE1> tex2{texture_path / "awesomeface.png"};
+
+    Uniform<int> texHandler{"texture1", sp.getProgramNumber(), 0};
+    Uniform<int> tex2Handler{"texture2", sp.getProgramNumber(), 1};
 
     // Main loop
     while (glfwhandle.heartbeat())
@@ -101,7 +105,6 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         sp.use();
-        tex.bind();
         vao.bind();
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

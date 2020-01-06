@@ -12,9 +12,11 @@ class Uniform
 public:
     Uniform(std::string name, const unsigned int shaderProgram, T data) : name{name}, shaderProgram{shaderProgram}, data{data}, updateFunc{setNull}, alternateFuncFlag{false}
     {
+        update();
     }
     Uniform(std::string name, const unsigned int shaderProgram, T data, func updateFunc) : name{name}, shaderProgram{shaderProgram}, data{data}, updateFunc{updateFunc}, alternateFuncFlag{true}
     {
+        update();
     }
     Uniform(const Uniform &other) = delete;
     Uniform(Uniform &&other)
@@ -24,6 +26,7 @@ public:
         // not touching data. If I add dynamic I need to clear it
         updateFunc = setNull;
         swap(*this, other);
+        update();
     }
     Uniform &operator=(const Uniform &other) = delete;
     Uniform &operator=(Uniform &&other)
@@ -32,6 +35,7 @@ public:
         shaderProgram = 0;
         updateFunc = setNull;
         swap(*this, other);
+        update();
     }
 
     void setData(const T &newData)
@@ -52,6 +56,7 @@ public:
     // Check alternateFuncFlag to see if user supplied a different function for update
     // Doing this so the user does not have to create sub-uniform classes while getting
     // custom functionality out of them.
+    // TODO:: make update call on construction?
     void update()
     {
         if (!alternateFuncFlag)
@@ -93,6 +98,7 @@ public:
             }
             else if constexpr (std::is_integral_v<T>)
             {
+                //std::cout << "SETTING LOCATION: " << loc << "TO:" << data << "\n";
                 glUniform1i(loc, (int)data);
             }
             else

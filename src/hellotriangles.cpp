@@ -91,14 +91,11 @@ int main()
 
     sp.use();
     Uniform uni{"color", sp.getProgramNumber(), vec3<float>{1.0f, 0.0f, 0.0f}};
+    sp2.use();
     Uniform uni2{
         "color", sp2.getProgramNumber(), vec3<float>{1.0f, 1.0f, 0.0f}, [=](vec3<float> data) {
             glUniform3f(sp2.getUniformLocation("color"), data.x, data.y, data.z);
         }};
-
-    uni.update();
-    sp2.use();
-    uni2.update();
 
     // Main loop
     while (glfwhandle.heartbeat())
