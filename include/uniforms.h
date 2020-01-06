@@ -5,14 +5,7 @@ template <typename T>
 void setNull(T data)
 {
 }
-/*
-template <typename T, typename func>
-class Uniform;
 
-template <typename T, typename func>
-void setDefaultUpdate(Uniform<T, func> &uni);
-*/
-//template <typename T, typename func = void (*)(T)>
 template <typename T, typename func = void (*)(T)>
 class Uniform
 {
@@ -23,34 +16,18 @@ public:
     Uniform(std::string name, const unsigned int shaderProgram, T data, func updateFunc) : name{name}, shaderProgram{shaderProgram}, data{data}, updateFunc{updateFunc}, alternateFuncFlag{true}
     {
     }
-    // TODO:: disable copy because uniform is a resource?
-    Uniform(const Uniform &other)
-    {
-        std::cout << "COPY CONSTRUCTOR \n";
-
-        name = other.name;
-        shaderProgram = other.shaderProgram;
-        data = other.data;
-        updateFunc = other.updateFunc;
-    }
+    Uniform(const Uniform &other) = delete;
     Uniform(Uniform &&other)
     {
-        std::cout << "MOVE CONSTRUCTOR \n";
         name = "";
         shaderProgram = 0;
         // not touching data. If I add dynamic I need to clear it
         updateFunc = setNull;
         swap(*this, other);
     }
-    Uniform &operator=(const Uniform &other)
-    {
-        std::cout << "COPY ASSIGNMENT\n";
-        Uniform cpy = other;
-        swap(*this, cpy);
-    }
+    Uniform &operator=(const Uniform &other) = delete;
     Uniform &operator=(Uniform &&other)
     {
-        std::cout << "MOVE ASSIGNMENT\n";
         name = "";
         shaderProgram = 0;
         updateFunc = setNull;
@@ -88,7 +65,6 @@ public:
     }
 
     // Default funcs to use
-
     void defaultUpdate(T data)
     {
         int loc = glGetUniformLocation(shaderProgram, name.c_str());
@@ -125,8 +101,6 @@ public:
             }
         }
     }
-
-    //friend void setDefaultUpdate<T, func>(Uniform<T, func> &uni);
 
     friend void swap(Uniform &first, Uniform &second)
     {

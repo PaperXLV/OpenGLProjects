@@ -7,12 +7,9 @@
 template <typename T>
 struct vec3
 {
-    //using c_type = typename vec3::type;
     using c_type = T;
 
     T x, y, z;
-
-    //using c_type = typename T;
 
     constexpr vec3() : x{0}, y{0}, z{0}
     {

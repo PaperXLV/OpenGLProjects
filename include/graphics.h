@@ -63,7 +63,6 @@ private:
     std::vector<T> vertices{};
 };
 
-// Needs work on the setAttrib function.
 template <typename func>
 class VAO
 {
@@ -104,6 +103,7 @@ public:
         glBindVertexArray(0);
     }
 
+    //TODO:: Some default attribs similar to how uniforms work
     void setAttribs()
     {
         bind();
