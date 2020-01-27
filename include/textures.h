@@ -7,7 +7,7 @@
 #include <filesystem>
 
 //TODO:: define this in a user-based way
-static const std::filesystem::path texture_path{"/home/sam/Dev/OpenGL/learning_projects/textures"};
+static const std::filesystem::path texture_path{"/media/sam/venus/OpenGL/learning_projects/textures"};
 
 //TODO:: optimize compile time
 template <size_t storage_format, size_t input_format = storage_format, size_t texture_num = GL_TEXTURE0>

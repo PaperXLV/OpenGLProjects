@@ -70,6 +70,7 @@ public:
     }
 
     // Default funcs to use
+    // Note:: using defaults requires T has typename::c_type and name if it's a class
     void defaultUpdate(T data)
     {
         int loc = glGetUniformLocation(shaderProgram, name.c_str());
@@ -78,12 +79,34 @@ public:
         {
             if constexpr (std::is_floating_point_v<typename T::c_type>)
             {
-                glUniform3f(loc, data.x, data.y, data.z);
+                if constexpr (data.name == "vec3"sv)
+                {
+                    glUniform3f(loc, data.x, data.y, data.z);
+                }
+                else if constexpr (data.name == "mat4"sv)
+                {
+                    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(data.data));
+                }
+                else
+                {
+                    std::cout << "unsupported type for nonTrivial default\n";
+                }
             }
             // watch out for booleans, idk if they will bug or not
             else if constexpr (std::is_integral_v<typename T::c_type>)
             {
-                glUniform3i(loc, data.x, data.y, data.z);
+                if constexpr (data.name == "vec3"sv)
+                {
+                    glUniform3i(loc, data.x, data.y, data.z);
+                }
+                else if constexpr (data.name == "mat4"sv)
+                {
+                    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(data.data));
+                }
+                else
+                {
+                    std::cout << "unsupported type for nonTrivial default\n";
+                }
             }
             else
             {
@@ -98,7 +121,6 @@ public:
             }
             else if constexpr (std::is_integral_v<T>)
             {
-                //std::cout << "SETTING LOCATION: " << loc << "TO:" << data << "\n";
                 glUniform1i(loc, (int)data);
             }
             else

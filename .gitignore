@@ -1,4 +1,5 @@
 build/
 glad/
+glm/
 .vscode/
 include/stb_image.h
